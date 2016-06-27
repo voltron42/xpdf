@@ -1,25 +1,25 @@
 <?php
 
-include "../../lib/fpdf181/fpdf.php"
+include "../../lib/fpdf181/fpdf.php";
 
 class xpdf extends FPDF {
 
 }
 
 class PdfFactory {
-  public void build(Document $doc) {
+  public function build(Document $doc) {
     $pdf = new xpdf();
     $doc->apply($pdf);
   }
 }
 
 interface Element {
-  protected function apply(xpdf $pdf);
+  function apply(xpdf $pdf);
 }
 
 class Document implements Element {
-  protected function apply(xpdf $pdf) {
-    echo "applying pdf"
+  function apply(xpdf $pdf) {
+    echo "applying pdf";
   }
 }
 # AcceptPageBreak - accept or not automatic page break
