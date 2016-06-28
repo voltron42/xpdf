@@ -1,30 +1,36 @@
 <?php
 
 include "../../lib/fpdf181/fpdf.php";
-include "enums.php";
+include "elements.php";
 
 class xpdf extends FPDF {
   private $isUTF8;
   private $header;
   private $footer;
 
-  function setHeaderAndFooter(Body $header, Body $footer, bool $isUTF8) {
+  function setUTF8(bool $isUTF8) {
     $this->isUTF8 = $isUTF8;
+  }
+
+  function setHeader(Body $header) {
     $this->header = $header;
+  }
+
+  function setFooter(Body $footer) {
     $this->footer = $footer;
   }
 
   function Footer() {
-    $this->footer->apply($this, $this->isUTF8);
+    if (isset($this->footer)) {
+      $this->footer->apply($this, $this->isUTF8);
+    }
   }
 
   function Header() {
-    $this->header->apply($this, $this->isUTF8);
+    if (isset($this->header)) {
+      $this->header->apply($this, $this->isUTF8);
+    }
   }
-}
-
-interface Element {
-  function apply(xpdf $pdf, bool $isUTF8);
 }
 
 class Document {
@@ -39,40 +45,70 @@ class Document {
   private $pages;
 
   function __construct(
+    Output $output,
     Orientation $orientation,
     Unit $unit,
     PageSize $pageSize,
-    bool $isUTF8,
-    Output $output,
-    Metadata $metadata,
-    Body $header,
-    Body $footer,
+    Body $header = NULL,
+    Body $footer = null,
+    bool $isUTF8 = false,
+    Metadata $metadata = NULL,
     Page ...$pages
   ) {
+    $this->output = $output;
     $this->orientation = $orientation;
     $this->unit = $unit;
     $this->pageSize = $pageSize;
     $this->isUTF8 = $isUTF8;
-    $this->output = $output;
     $this->metadata = $metadata;
     $this->header = $header;
     $this->footer = $footer;
     $this->pages = $pages;
   }
 
+  static function default() {
+    return new Document(
+      Output::default(),
+      Orientation::Portrait(),
+      Unit::Millimeter(),
+      StdPageSize::A4()
+    );
+  }
+
+  function newPage() {
+    $page = new Page(
+      $this->orientation,
+      $this->pageSize,
+      PageRotation::Full()
+    );
+    $this->addPage($page);
+    return $page;
+  }
+
+  function addPage(Page $page) {
+    array_push($this->pages, $page);
+  }
+
   function build() {
     $pdf = new xpdf(
-      $this->orientation->toString(),
-      $this->unit->toString(),
+      $this->orientation->getLabel(),
+      $this->unit->getLabel(),
       $this->pageSize->getSize()
     );
-    $pdf->setHeaderAndFooter($this->header, $this->footer, $this->isUTF8);
-    $this->metadata->apply($pdf, $isUTF8 || $this->isUTF8);
+    $pdf->setUTF8($isUTF8 || $this->isUTF8);
+    if (isset($this->header)) {
+      $pdf->setHeader($this->header);
+    }
+    if (isset($this->footer)) {
+      $pdf->setHeader($this->footer);
+    }
+    if (isset($this->metadata)) {
+      $this->metadata->apply($pdf, $isUTF8 || $this->isUTF8);
+    }
     foreach($this->pages as $page) {
       $page->apply($pdf, $isUTF8 || $this->isUTF8);
     }
     $this->output->apply($pdf, $isUTF8 || $this->isUTF8);
-    echo "applying doc\n";
   }
 }
 
@@ -88,13 +124,21 @@ class Output implements Element {
   ) {
     $this->dest = $dest;
     $this->name = $name;
-    $this->$compress;
+    $this->compress = $compress;
+  }
+
+  static function default() {
+    return new Output(
+      Destination::LocalFile(),
+      "doc.pdf",
+      false
+    );
   }
 
   function apply(xpdf $pdf, bool $isUTF8) {
     $pdf->SetCompression($this->compress);
     $pdf->Output(
-      $this->dest,
+      $this->dest->getLabel(),
       $this->name,
       $isUTF8
     );
@@ -128,6 +172,10 @@ class Metadata implements Element {
     $this->fonts = $fonts;
   }
 
+  function addFont(Font $font) {
+    array_push($this->fonts, $font);
+  }
+
   function apply(xpdf $pdf, bool $isUTF8) {
     $pdf->SetTitle($this->title, $isUTF8);
     $pdf->SetAuthor($this->author, $isUTF8);
@@ -138,40 +186,28 @@ class Metadata implements Element {
     foreach($this->fonts as $font) {
       $font->apply($pdf, $isUTF8);
     }
-    echo "applying output\n";
   }
 }
 
-class Font implements Element {
-  private $family;
-  private $style;
-  private $file;
+class Body implements Element {
+  private $elements;
 
-  function __construct(
-    string $family,
-    String $file,
-    FontStyle ...$style
-  ) {
-    $this->family = $family;
-    $this->file = $file;
-    $this->style = $style;
+  function __construct(BodyElement ...$elements) {
+    $this->elements = $elements;
+  }
+
+  function addElement(BodyElement $elem) {
+    array_push($this->elements, $elem);
   }
 
   function apply(xpdf $pdf, bool $isUTF8) {
-    $stylestring = '';
-    foreach($this->style as $style) {
-      $stylestring .= $style;
+    foreach ($this->elements as $element) {
+      $element->apply($pdf, $isUTF8);
     }
-    $pdf->AddFont(
-      $this->family,
-      $stylestring,
-      $this->file
-    );
   }
 }
 
-
-class Page extends Body {
+class Page extends Body implements Element {
   private $orientation;
   private $pageSize;
   private $rotation;
@@ -190,64 +226,24 @@ class Page extends Body {
 
   function apply(xpdf $pdf, bool $isUTF8) {
     $pdf->AddPage(
-      $this->orientation->toString(),
+      $this->orientation->getLabel(),
       $this->pageSize->getSize(),
       $this->rotation->getRotation()
     );
     parent::apply($pdf, $isUTF8);
-    echo "applying output\n";
   }
 }
 
-
-class Body implements Element {
-  private $elements;
-
-  function __construct(BodyElement ...$elements) {
-    $this->elements = $elements;
-  }
-
-  function apply(xpdf $pdf, bool $isUTF8) {
-    foreach ($this->elements as $element) {
-      $element->apply($pdf, $isUTF8);
-    }
-  }
-}
-
-interface BodyElement extends Element {}
+# SetAutoPageBreak - set the automatic page breaking mode
+# SetDisplayMode - set display mode
 
 # AcceptPageBreak - accept or not automatic page break
-# AddLink - create an internal link
-# Cell - print a cell
 # GetPageHeight - get current page height
 # GetPageWidth - get current page width
 # GetStringWidth - compute string length
 # GetX - get current x position
 # GetY - get current y position
-# Image - output an image
-# Line - draw a line
-# Link - put a link
-# Ln - line break
-# MultiCell - print text with line breaks
 # PageNo - page number
-# Rect - draw a rectangle
-# SetAutoPageBreak - set the automatic page breaking mode
-# SetDisplayMode - set display mode
-# SetDrawColor - set drawing color
-# SetFillColor - set filling color
-# SetFont - set font
-# SetFontSize - set font size
-# SetLeftMargin - set left margin
-# SetLineWidth - set line width
-# SetLink - set internal link destination
-# SetMargins - set margins
-# SetRightMargin - set right margin
-# SetTextColor - set text color
-# SetTopMargin - set top margin
-# SetX - set current x position
-# SetXY - set current x and y positions
-# SetY - set current y position and optionally reset x
-# Text - print a string
-# Write - print flowing text
+
 
 ?>

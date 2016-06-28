@@ -1,43 +1,26 @@
 <?php
 
-class Unit {
-  private static $values = array("Point" => new Unit("pt"), "Millimeter" => new Unit("mm"), "Centimeter" => new Unit("cm"), "Inch" => new Unit("in"));
+include "../foreman/enum/enum.php";
 
-  private $label;
-  private function __construct($label) {
-    $this->label = $label;
-  }
-  static function parse(string $strval) {
-    if (!array_key_exists) {
-      throw new Exception("$strval is not a valid value for Unit");
-    }
-    return $values[$strval];
-  }
-  function toString() {
-    return $this->label;
-  }
-}
+class Unit extends Enum {
+  private static $raw = array(
+    "Point" => "pt",
+    "Millimeter" => "mm",
+    "Centimeter" => "cm",
+    "Inch" => "in"
+  );
 
-class Destination {
-  const Inline = new Destination("I");
-  const Download = new Destination("D");
-  const LocalFile = new Destination("F");
-  const StringOut = new Destination("S");
+	protected static function rawValues() {
+		return self::$raw;
+	}
 
-  private $label;
+	protected static function className() {
+		return __CLASS__."";
+	}
 
-  private function __construct($label) {
-    $this->label = $label;
-  }
-
-  function toString() {
-    return $this->label;
-  }
-}
-
-class FontStyle {
-  const Bold = new FontStyle("B");
-  const Italic = new FontStyle("I");
+	protected static function build($arg) {
+		return new Unit($arg);
+	}
 
   private $label;
 
@@ -45,14 +28,30 @@ class FontStyle {
     $this->label = $label;
   }
 
-  function toString() {
+  function getLabel() {
     return $this->label;
   }
 }
 
-class Orientation {
-  const Portrait = new Orientation("P");
-  const Landscape = new Orientation("L");
+class Destination extends Enum {
+  private static $raw = array(
+    "Inline" => "I",
+    "Download" => "D",
+    "LocalFile" => "F",
+    "StringOut" => "S"
+  );
+
+	protected static function rawValues() {
+		return self::$raw;
+	}
+
+	protected static function className() {
+		return __CLASS__."";
+	}
+
+	protected static function build($arg) {
+		return new Destination($arg);
+	}
 
   private $label;
 
@@ -60,16 +59,88 @@ class Orientation {
     $this->label = $label;
   }
 
-  function toString() {
+  function getLabel() {
     return $this->label;
   }
 }
 
-class PageRotation {
-  const Quarter = new PageRotation(90);
-  const Half = new PageRotation(180);
-  const ThreeQuarter = new PageRotation(270);
-  const Full = new PageRotation(360);
+class FontStyle extends Enum {
+  private static $raw = array(
+    "Bold" => "B",
+    "Italic" => "I"
+  );
+
+	protected static function rawValues() {
+		return self::$raw;
+	}
+
+	protected static function className() {
+		return __CLASS__."";
+	}
+
+	protected static function build($arg) {
+		return new FontStyle($arg);
+	}
+
+  private $label;
+
+  private function __construct($label) {
+    $this->label = $label;
+  }
+
+  function getLabel() {
+    return $this->label;
+  }
+}
+
+class Orientation extends Enum {
+  private static $raw = array(
+    "Portrait" => "P",
+    "Landscape" => "L"
+  );
+
+	protected static function rawValues() {
+		return self::$raw;
+	}
+
+	protected static function className() {
+		return __CLASS__."";
+	}
+
+	protected static function build($arg) {
+		return new Orientation($arg);
+	}
+
+  private $label;
+
+  private function __construct($label) {
+    $this->label = $label;
+  }
+
+  function getLabel() {
+    return $this->label;
+  }
+}
+
+class PageRotation extends Enum {
+  private static $raw = array(
+    "Quarter" => 90,
+    "Half" => 180,
+    "ThreeQuarter" => 270,
+    "Full" => 0
+  );
+
+	protected static function rawValues() {
+		return self::$raw;
+	}
+
+	protected static function className() {
+		return __CLASS__."";
+	}
+
+	protected static function build($arg) {
+		return new PageRotation($arg);
+	}
 
   private $rotation;
 
@@ -86,12 +157,26 @@ interface PageSize {
   function getSize();
 }
 
-class StdPageSize implements PageSize {
-  const A3 = new StdPageSize("A3");
-  const A4 = new StdPageSize("A4");
-  const A5 = new StdPageSize("A5");
-  const Letter = new StdPageSize("Letter");
-  const Legal = new StdPageSize("Legal");
+class StdPageSize extends Enum implements PageSize {
+  private static $raw = array(
+    "A3" => "A3",
+    "A4" => "A4",
+    "A5" => "A5",
+    "Letter" => "Letter",
+    "Legal" => "Legal"
+  );
+
+  protected static function rawValues() {
+		return self::$raw;
+	}
+
+	protected static function className() {
+		return __CLASS__."";
+	}
+
+	protected static function build($arg) {
+		return new StdPageSize($arg);
+	}
 
   private $label;
 
