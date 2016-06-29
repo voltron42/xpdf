@@ -1,8 +1,6 @@
 <?php
 
-include "xpdf.php";
-$doc = new Document();
-$factory = new PdfFactory();
-$factory->build($doc);
-echo "finished";
+include "demo.php";
+Demo::main(Destination::Inline());
+
 ?>

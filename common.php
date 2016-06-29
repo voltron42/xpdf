@@ -29,6 +29,7 @@ class Font implements Element {
 
   function apply(xpdf $pdf, bool $isUTF8) {
     $stylestring = '';
+    $this->style = array_unique($this->style);
     foreach($this->style as $style) {
       $stylestring .= $style;
     }

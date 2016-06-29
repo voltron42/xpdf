@@ -19,6 +19,7 @@ class SetFont implements BodyElement {
 
   function apply(xpdf $pdf, bool $isUTF8) {
     $stylestring = '';
+    $this->style = array_unique($this->style);
     foreach($this->style as $style) {
       $stylestring .= $style;
     }
@@ -287,27 +288,300 @@ class Cell implements BodyElement {
       $this->txt,
       $this->border->getValue(),
       $this->ln->getValue(),
-      $this->align->getLabel()
+      $this->align->getLabel(),
+      $this->fill
     );
   }
 }
 
-# SetFontSize - set font size
-# SetLeftMargin - set left margin
-# SetLineWidth - set line width
-# SetMargins - set margins
-# SetRightMargin - set right margin
-# SetTopMargin - set top margin
-# SetX - set current x position
-# SetXY - set current x and y positions
-# SetY - set current y position and optionally reset x
+class MultiCell implements BodyElement {
+  private $w;
+  private $h;
+  private $txt;
+  private $border;
+  private $align;
+  private $fill;
+
+  function __construct(
+    float $w,
+    float $h,
+    string $txt,
+    CellBorder $border,
+    CellAlign $align,
+    bool $fill
+  ) {
+    $this->w = $w;
+    $this->h = $h;
+    $this->txt = $txt;
+    $this->border = $border;
+    $this->align = $align;
+    $this->fill = $fill;
+  }
+
+  static function default(
+    float $w = 0,
+    float $h = 0,
+    string $txt = ""
+  ) {
+    return new MultiCell(
+      $w, $h, $txt,
+      CellBorder::NoBorder(),
+      CellAlign::Left(),
+      false
+    );
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->MultiCell(
+      $this->w,
+      $this->h,
+      $this->txt,
+      $this->border->getValue(),
+      $this->align->getLabel(),
+      $this->fill
+    );
+  }
+}
+
+class Ln implements BodyElement {
+
+  private $h;
+
+  function __construct(float $h = 0) {
+    $this->h = $h;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    if($this->h > 0) {
+      $pdf->Ln($this->h);
+    } else {
+      $pdf->Ln();
+    }
+  }
+}
+
+class DrawStyle extends Enum {
+  private static $raw = array(
+    "Draw" => "D",
+    "Fill" => "F",
+  );
+
+  protected static function rawValues() {
+    return self::$raw;
+  }
+
+  protected static function className() {
+    return __CLASS__."";
+  }
+
+  protected static function build($arg) {
+    return new DrawStyle($arg);
+  }
+
+  private $label;
+
+  private function __construct($label) {
+    $this->label = $label;
+  }
+
+  function getLabel() {
+    return $this->label;
+  }
+}
+
+class Rect implements BodyElement {
+  private $x;
+  private $y;
+  private $w;
+  private $h;
+  private $style;
+
+  function __construct(float $x, float $y, float $w, float $h, DrawStyle ...$style) {
+    $this->x = $x;
+    $this->y = $y;
+    $this->w = $w;
+    $this->h = $h;
+    $this->style = $style;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $stylestring = '';
+    $this->style = array_unique($this->style, SORT_REGULAR);
+    foreach($this->style as $style) {
+      $stylestring .= $style->getLabel();
+    }
+    $pdf->Rect(
+      $this->x,
+      $this->y,
+      $this->w,
+      $this->h,
+      $stylestring
+    );
+  }
+}
+
+class Line implements BodyElement {
+  private $x1;
+  private $y1;
+  private $x2;
+  private $y2;
+
+  function __construct(
+    float $x1,
+    float $y1,
+    float $x2,
+    float $y2
+  ) {
+    $this->x1 = $x1;
+    $this->y1 = $y1;
+    $this->x2 = $x2;
+    $this->y2 = $y2;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->Line(
+      $this->x1,
+      $this->y1,
+      $this->x2,
+      $this->y2
+    );
+  }
+}
+
+class SetLineWidth implements BodyElement {
+
+  private $width;
+
+  function __construct(float $width) {
+    $this->width = $width;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetLineWidth($this->width);
+  }
+}
+
+class SetFontSize implements BodyElement {
+
+  private $size;
+
+  function __construct(float $size) {
+    $this->size = $size;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetFontSize($this->size);
+  }
+}
+
+class SetTopMargin implements BodyElement {
+
+  private $margin;
+
+  function __construct(float $margin) {
+    $this->margin = $margin;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetTopMargin($this->margin);
+  }
+}
+
+class SetRightMargin implements BodyElement {
+
+  private $margin;
+
+  function __construct(float $margin) {
+    $this->margin = $margin;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetRightMargin($this->margin);
+  }
+}
+
+class SetLeftMargin implements BodyElement {
+
+  private $margin;
+
+  function __construct(float $margin) {
+    $this->margin = $margin;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetLeftMargin($this->margin);
+  }
+}
+
+class SetMargins implements BodyElement {
+
+  private $left;
+  private $top;
+  private $right;
+
+  function __construct(float $left, float $top, float $right = 0) {
+    $this->left = $left;
+    $this->top = $top;
+    $this->right = $right;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    if ($this->right > 0) {
+      $pdf->SetMargins($this->left, $this->top, $this->right);
+    } else {
+      $pdf->SetMargins($this->left, $this->top);
+    }
+  }
+}
+
+class SetX implements BodyElement {
+
+  private $x;
+
+  function __construct(float $x) {
+    $this->x = $x;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetX($this->x);
+  }
+}
+
+class SetY implements BodyElement {
+
+  private $y;
+  private $resetX;
+
+  function __construct(float $y, bool $resetX = true) {
+    $this->y = $y;
+    $this->resetX = $resetX;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetY($this->y, $this->resetX);
+  }
+}
+
+class SetXY implements BodyElement {
+
+  private $x;
+  private $y;
+
+  function __construct(float $x, float $y) {
+    $this->x = $x;
+    $this->y = $y;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->SetXY($this->x, $this->y);
+  }
+}
+
 # Image - output an image
-# Line - draw a line
-# Link - put a link
-# Ln - line break
 # MultiCell - print text with line breaks
-# Rect - draw a rectangle
+
 # AddLink - create an internal link
 # SetLink - set internal link destination
+# Link - put a link
 
 ?>
