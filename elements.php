@@ -439,12 +439,9 @@ class Line implements BodyElement {
   }
 
   function apply(xpdf $pdf, bool $isUTF8) {
-    $pdf->Line(
-      $this->x1,
-      $this->y1,
-      $this->x2,
-      $this->y2
-    );
+    $pdf->moveTo($this->x1, $this->y1);
+    $pdf->lineTo($this->x2, $this->y2);
+    $pdf->closePath();
   }
 }
 
@@ -576,6 +573,111 @@ class SetXY implements BodyElement {
     $pdf->SetXY($this->x, $this->y);
   }
 }
+
+class LineCap extends Enum {
+  private static $raw = array(
+    "Butt" => "butt",
+    "RoundCap" => "round",
+    "Square" => "square"
+  );
+
+  protected static function rawValues() {
+    return self::$raw;
+  }
+
+  protected static function className() {
+    return __CLASS__."";
+  }
+
+  protected static function build($arg) {
+    return new LineCap($arg);
+  }
+
+  private $label;
+
+  private function __construct($label) {
+    $this->label = $label;
+  }
+
+  function getLabel() {
+    return $this->label;
+  }
+}
+
+class LineJoin extends Enum {
+  private static $raw = array(
+    "Miter" => "miter",
+    "RoundJoin" => "round",
+    "Bevel" => "bevel"
+  );
+
+  protected static function rawValues() {
+    return self::$raw;
+  }
+
+  protected static function className() {
+    return __CLASS__."";
+  }
+
+  protected static function build($arg) {
+    return new LineJoin($arg);
+  }
+
+  private $label;
+
+  private function __construct($label) {
+    $this->label = $label;
+  }
+
+  function getLabel() {
+    return $this->label;
+  }
+}
+
+class SetLineCap implements BodyElement {
+
+  private $lineCap;
+
+  function __construct(LineCap $lineCap) {
+    $this->lineCap = $lineCap;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->setLineCap($this->lineCap->getLabel());
+  }
+}
+
+class SetLineJoin implements BodyElement {
+
+  private $lineJoin;
+
+  function __construct(LineJoin $lineJoin) {
+    $this->lineJoin = $lineJoin;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->setLineJoin($this->lineJoin->getLabel());
+  }
+}
+
+class SetDash implements BodyElement {
+
+  private $phase;
+  private $dash;
+
+  function __construct(float $phase=0, float ...$dash) {
+    $this->phase = $phase;
+    $this->dash = $dash;
+  }
+
+  function apply(xpdf $pdf, bool $isUTF8) {
+    $pdf->setDash($this->phase, ...$this->dash);
+  }
+}
+
+# SetDash(phase, dash...)
+# Path > moveTo(x,y), lineTo(x,y), curveTo(x1,y1,x2,y2,x3,y3), closePath(style)
+
 
 # Image - output an image
 # MultiCell - print text with line breaks
