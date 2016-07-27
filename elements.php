@@ -10,7 +10,7 @@ class SetFont implements BodyElement {
   function __construct(
     string $family = "",
     float $size = 0,
-    SetFloatStyle ...$style
+    SetFontStyle ...$style
   ) {
     $this->family = $family;
     $this->size = $size;
@@ -55,7 +55,7 @@ class SetFontStyle extends Enum {
 	}
 
 	protected static function build($arg) {
-		return new FontStyle($arg);
+		return new SetFontStyle($arg);
 	}
 
   private $label;

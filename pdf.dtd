@@ -1,0 +1,135 @@
+<!ELEMENT document (output, header, footer, metadata, page*)>
+<!ATTLIST document
+orientation CDATA #IMPLIED
+unit CDATA #IMPLIED
+page-size CDATA #IMPLIED
+is-utf8 CDATA #IMPLIED
+>
+<!ELEMENT output EMPTY>
+<!ELEMENT header (element*)>
+<!ELEMENT footer (element*)>
+<!ELEMENT metadata (font*)>
+<!ELEMENT page (element*)>
+<!ATTLIST document
+orientation CDATA #IMPLIED
+page-size CDATA #IMPLIED
+page-rotation CDATA #IMPLIED
+>
+<!ELEMENT element (set-font|set-draw-color|set-fill-color|set-text-color|text|write|cell|multi-cell|ln|rect|line|set-line-width|set-font-size|set-top-margin|set-right-margin|set-left-margin|set-margins|set-x|set-y|set-xy|set-line-cap|set-line-join|set-dash)>
+<!ELEMENT set-font EMPTY>
+<!ATTLIST set-font
+family CDATA #REQUIRED
+size CDATA #REQUIRED
+style CDATA #REQUIRED
+>
+<!ELEMENT set-draw-color (color)>
+<!ELEMENT set-fill-color (color)>
+<!ELEMENT set-text-color (color)>
+<!ELEMENT color EMPTY>
+<!ATTLIST color
+r CDATA #REQUIRED
+g CDATA #REQUIRED
+b CDATA #REQUIRED
+>
+<!ELEMENT text ()>
+<!ATTLIST text
+x CDATA #REQUIRED
+y CDATA #REQUIRED
+text CDATA #REQUIRED
+>
+<!ELEMENT write ()>
+<!ATTLIST write
+h CDATA #REQUIRED
+text CDATA #REQUIRED
+>
+<!ELEMENT cell EMPTY>
+<!ATTLIST cell
+w CDATA #REQUIRED
+h CDATA #REQUIRED
+text CDATA #REQUIRED
+border (NoBorder) #REQUIRED
+next-position (ToTheRight|StartNextLine|Below) #REQUIRED
+align (Left|Center|Right) #REQUIRED
+fill (yes|no) #REQUIRED
+>
+<!ELEMENT multi-cell EMPTY>
+<!ATTLIST multi-cell
+w CDATA #REQUIRED
+h CDATA #REQUIRED
+text CDATA #REQUIRED
+border (NoBorder) #REQUIRED
+align (Left|Center|Right) #REQUIRED
+fill (yes|no) #REQUIRED
+>
+<!ELEMENT ln EMPTY>
+<!ATTLIST ln
+h CDATA #IMPLIED
+>
+<!ELEMENT rect EMPTY>
+<!ATTLIST rect
+x CDATA #REQUIRED
+y CDATA #REQUIRED
+w CDATA #REQUIRED
+h CDATA #REQUIRED
+style CDATA #REQUIRED
+>
+<!ELEMENT line EMPTY>
+<!ATTLIST line
+x1 CDATA #REQUIRED
+y1 CDATA #REQUIRED
+x2 CDATA #REQUIRED
+y2 CDATA #REQUIRED
+>
+<!ELEMENT set-line-width EMPTY>
+<!ATTLIST set-line-width
+line-width CDATA #REQUIRED
+>
+<!ELEMENT set-font-size EMPTY>
+<!ATTLIST set-font-size
+font-size CDATA #REQUIRED
+>
+<!ELEMENT set-top-margin EMPTY>
+<!ATTLIST set-top-margin
+margin CDATA #REQUIRED
+>
+<!ELEMENT set-right-margin EMPTY>
+<!ATTLIST set-right-margin
+margin CDATA #REQUIRED
+>
+<!ELEMENT set-left-margin EMPTY>
+<!ATTLIST set-left-margin
+margin CDATA #REQUIRED
+>
+<!ELEMENT set-margins EMPTY>
+<!ATTLIST set-margins
+left CDATA #REQUIRED
+top CDATA #REQUIRED
+right CDATA #IMPLIED
+>
+<!ELEMENT set-x EMPTY>
+<!ATTLIST set-x
+x CDATA #REQUIRED
+>
+<!ELEMENT set-y ()>
+<!ATTLIST set-y
+y CDATA #REQUIRED
+reset-x CDATA #IMPLIED
+>
+<!ELEMENT set-xy EMPTY>
+<!ATTLIST set-xy
+x CDATA #REQUIRED
+y CDATA #REQUIRED
+>
+<!ELEMENT set-line-cap EMPTY>
+<!ATTLIST set-line-cap
+line-cap (Butt|RoundCap|Square) #REQUIRED
+>
+<!ELEMENT set-line-join EMPTY>
+<!ATTLIST set-line-join
+line-join (Miter|RoundJoin|Bevel) #REQUIRED
+>
+<!ELEMENT set-dash EMPTY>
+<!ATTLIST set-dash
+phase CDATA #IMPLIED
+dash CDATA #IMPLIED
+>

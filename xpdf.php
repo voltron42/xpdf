@@ -83,7 +83,7 @@ class xpdf extends FPDF {
     $this->scale(-100, -100, $x, $y);
   }
 
-  function MirrorL($angle=0, $x='',$y=''){
+  function mirrorL($angle=0, $x='',$y=''){
     $this->scale(-100, 100, $x, $y);
     $this->rotate(-2*($angle-90),$x,$y);
   }
