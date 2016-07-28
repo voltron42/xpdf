@@ -6,43 +6,26 @@ class Demo {
 
   public static function main(Destination $dest) {
     $doc = Document::default($dest);
+    $doc = new Document(
+      new Output($dest),
+      Orientation::Landscape(),
+      Unit::Inch(),
+      StdPageSize::A4()
+    );
     $page = $doc->newPage();
-    $page->addElement(new SetFont("Arial",14));
-    $page->addElement(new SetTextColor(new Color(0,0,128)));
-    $page->addElement(Cell::default(0, 14, "Hello World!"));
-    $page->addElement(Cell::default(0, 14, "Hello Again!"));
-    $page->addElement(new SetDrawColor(new Color(0,255,0)));
-    $page->addElement(new SetFillColor(new Color(255,0,0)));
-    $page->addElement(new SetLineWidth(1));
-    $page->addElement(new SetLineJoin(LineJoin::Miter()));
-    $page->addElement(new Rect(115,50,15,25));
-    $page->addElement(new Rect(135,50,15,25,DrawStyle::Fill()));
-    $page->addElement(new SetLineJoin(LineJoin::RoundJoin()));
-    $page->addElement(new Rect(115,80,15,25,DrawStyle::Draw()));
-    $page->addElement(new SetLineJoin(LineJoin::Bevel()));
-    $page->addElement(new Rect(135,80,15,25,DrawStyle::Draw(),DrawStyle::Fill()));
-    $page->addElement(new SetDrawColor(new Color(0,0,255)));
-    $page->addElement(new Line(115,50,150,105));
-    $page->addElement(new SetDrawColor(new Color(128,0,255)));
-    $page->addElement(new SetDash(0,10));
-    $page->addElement(new Line(115,105,150,50));
-    $page->addElement(new SetDrawColor(new Color(128,0,0)));
-    $page->addElement(new SetDash(0,5,2));
-    $page->addElement(new Line(115,120,150,120));
-    $page->addElement(new SetDash(0,10,5));
-    $page->addElement(new Line(115,130,150,130));
-    $page->addElement(new SetDash(0,15,20));
-    $page->addElement(new Line(115,140,150,140));
-    $page->addElement(new SetDash());
-    $page->addElement(new SetLineCap(LineCap::Butt()));
-    $page->addElement(new Line(115,150,150,150));
-    $page->addElement(new SetLineCap(LineCap::RoundCap()));
-    $page->addElement(new Line(115,160,150,160));
-    $page->addElement(new SetLineCap(LineCap::Square()));
-    $page->addElement(new Line(115,170,150,170));
-    $page->addElement(new SetFontSize(10));
-    $page->addElement(MultiCell::default(100,10,self::$loremIpsum));
-    //$page->addElement(new Text(15,15,"Hello World!"));
+    $page->addElement(new SetTextColor(new Color(0,0,0)));
+    //$page->addElement(new SetFont("Lucida Console",14));
+    //$page->addElement(Cell::default(0, 14, "Hello World!"));
+    $page->addElement(new Rect(18.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(82.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(146.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(210.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(284.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(18.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(82.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(146.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(210.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(274.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
 
     $doc->build();
   }
