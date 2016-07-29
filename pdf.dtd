@@ -1,21 +1,39 @@
-<!ELEMENT document (output, header, footer, metadata, page*)>
+<!ELEMENT document (output, header, footer, metadata, pages)>
 <!ATTLIST document
-orientation CDATA #IMPLIED
-unit CDATA #IMPLIED
+orientation (Portrait|Landscape) #IMPLIED
+unit (Point|Millimeter|Centimeter|Inch) #IMPLIED
 page-size CDATA #IMPLIED
-is-utf8 CDATA #IMPLIED
+is-utf8 (true|false) #IMPLIED
 >
 <!ELEMENT output EMPTY>
-<!ELEMENT header (element*)>
-<!ELEMENT footer (element*)>
-<!ELEMENT metadata (font*)>
-<!ELEMENT page (element*)>
-<!ATTLIST document
-orientation CDATA #IMPLIED
-page-size CDATA #IMPLIED
-page-rotation CDATA #IMPLIED
+<!ATTLIST output
+file-name CDATA #IMPLIED
+compress (true|false) #IMPLIED
 >
-<!ELEMENT element (set-font|set-draw-color|set-fill-color|set-text-color|text|write|cell|multi-cell|ln|rect|line|set-line-width|set-font-size|set-top-margin|set-right-margin|set-left-margin|set-margins|set-x|set-y|set-xy|set-line-cap|set-line-join|set-dash)>
+<!ELEMENT header (set-font|set-draw-color|set-fill-color|set-text-color|text|write|cell|multi-cell|ln|rect|line|set-line-width|set-font-size|set-top-margin|set-right-margin|set-left-margin|set-margins|set-x|set-y|set-xy|set-line-cap|set-line-join|set-dash)*>
+<!ELEMENT footer (set-font|set-draw-color|set-fill-color|set-text-color|text|write|cell|multi-cell|ln|rect|line|set-line-width|set-font-size|set-top-margin|set-right-margin|set-left-margin|set-margins|set-x|set-y|set-xy|set-line-cap|set-line-join|set-dash)*>
+<!ELEMENT metadata (font)*>
+<!ATTLIST metadata
+title CDATA #IMPLIED
+author CDATA #IMPLIED
+subject CDATA #IMPLIED
+keywords CDATA #IMPLIED
+creator CDATA #IMPLIED
+alias-nb-pages CDATA #IMPLIED
+>
+<!ELEMENT font EMPTY>
+<!ATTLIST font
+family CDATA #REQUIRED
+file CDATA #REQUIRED
+style CDATA #REQUIRED
+>
+<!ELEMENT pages (page)+>
+<!ELEMENT page (set-font|set-draw-color|set-fill-color|set-text-color|text|write|cell|multi-cell|ln|rect|line|set-line-width|set-font-size|set-top-margin|set-right-margin|set-left-margin|set-margins|set-x|set-y|set-xy|set-line-cap|set-line-join|set-dash)*>
+<!ATTLIST page
+orientation (Portrait|Landscape) #IMPLIED
+page-size CDATA #IMPLIED
+page-rotation (Quarter|Half|ThreeQuarter|Full) #IMPLIED
+>
 <!ELEMENT set-font EMPTY>
 <!ATTLIST set-font
 family CDATA #REQUIRED

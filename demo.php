@@ -10,17 +10,22 @@ class Demo {
       new Output($dest),
       Orientation::Landscape(),
       Unit::Inch(),
-      StdPageSize::A4()
+      new CustomPgSize(8.5,11)
     );
     $page = $doc->newPage();
     $page->addElement(new SetTextColor(new Color(0,0,0)));
     //$page->addElement(new SetFont("Lucida Console",14));
     //$page->addElement(Cell::default(0, 14, "Hello World!"));
+    $page->addElement(new Rect(0,0,11,0.75,DrawStyle::Draw()));
+    $page->addElement(new Rect(0,0,0.5,8.5,DrawStyle::Draw()));
+    $page->addElement(new Rect(0,7.75,11,0.75,DrawStyle::Draw()));
+    $page->addElement(new Rect(10.5,0,0.5,8.5,DrawStyle::Draw()));
+
     $page->addElement(new Rect(18.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
     $page->addElement(new Rect(82.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
     $page->addElement(new Rect(146.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
     $page->addElement(new Rect(210.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
-    $page->addElement(new Rect(284.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
+    $page->addElement(new Rect(274.0/32.0,27.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
     $page->addElement(new Rect(18.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
     $page->addElement(new Rect(82.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
     $page->addElement(new Rect(146.0/32.0,140.0/32.0,60.0/32.0,105.0/32.0,DrawStyle::Draw()));
